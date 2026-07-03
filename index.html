@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MORTAL CONNECTION — Luis Ybrahim Álvarez Lugo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050508;
+    --bg-soft:#0a0a16;
+    --cyan:#00e5ff;
+    --magenta:#ff2ec4;
+    --violet:#7c3aff;
+    --text:#f3f3f9;
+    --text-dim:#9d9db2;
+    --glass:rgba(255,255,255,0.045);
+    --glass-strong:rgba(255,255,255,0.08);
+    --glass-border:rgba(255,255,255,0.10);
+    --radius:22px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    overflow-x:hidden;
+    cursor:default;
+    line-height:1.5;
+  }
+  h1,h2,h3,.brand{font-family:'Space Grotesk',-apple-system,sans-serif;}
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  ::selection{background:var(--magenta);color:#fff;}
+  .container{max-width:1320px;margin:0 auto;padding:0 6vw;}
+
+  /* ---------- noise overlay ---------- */
+  .noise-overlay{
+    position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* ---------- custom cursor ---------- */
+  .cursor-dot,.cursor-outline{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+  .cursor-dot{width:6px;height:6px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .cursor-outline{width:34px;height:34px;border:1.5px solid rgba(0,229,255,.5);transition:width .25s,height .25s,border-color .25s,background .25s;}
+  .cursor-outline.grow{width:60px;height:60px;border-color:var(--magenta);background:rgba(255,46,196,.08);}
+
+  /* ---------- progress bar ---------- */
+  .progress-bar-wrap{position:fixed;top:0;left:0;width:100%;height:3px;background:rgba(255,255,255,.06);z-index:1000;}
+  .progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--magenta));transition:width .1s linear;}
+
+  /* ---------- nav ---------- */
+  .nav{
+    position:fixed;top:3px;left:0;right:0;z-index:900;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 6vw;transition:all .35s ease;
+  }
+  .nav.scrolled{
+    padding:14px 6vw;background:rgba(5,5,8,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--glass-border);
+  }
+  .nav-brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1rem;letter-spacing:.5px;}
+  .dot-pulse{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:pulse 2s infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.4);}}
+  .nav-links{display:flex;gap:34px;font-size:.82rem;letter-spacing:1px;font-weight:600;color:var(--text-dim);}
+  .nav-links a{transition:color .25s;}
+  .nav-links a:hover{color:var(--cyan);}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:100px;font-weight:700;font-size:.86rem;
+    letter-spacing:.3px;border:none;cursor:pointer;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;
+  }
+  .btn-primary{background:linear-gradient(120deg,var(--cyan),var(--violet) 55%,var(--magenta));color:#04040a;box-shadow:0 10px 30px -8px rgba(124,58,255,.7);}
+  .btn-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 40px -8px rgba(255,46,196,.6);}
+  .btn-ghost{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);}
+  .btn-ghost:hover{background:var(--glass-strong);}
+  .nav .btn{padding:10px 22px;font-size:.78rem;}
+  @media(max-width:860px){.nav-links{display:none;}}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:130px 0 60px;overflow:hidden;}
+  #neuralCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55;}
+  .hero-glow{position:absolute;border-radius:50%;filter:blur(90px);z-index:0;opacity:.55;animation:float 10s ease-in-out infinite;}
+  .glow1{width:480px;height:480px;background:var(--violet);top:-100px;left:-120px;}
+  .glow2{width:420px;height:420px;background:var(--magenta);bottom:-120px;right:-100px;animation-delay:2s;}
+  @keyframes float{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,-25px);}}
+  .hero-grid{position:relative;z-index:3;display:grid;grid-template-columns:1.08fr .92fr;gap:70px;align-items:center;}
+  .eyebrow{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:2.5px;color:var(--cyan);padding:7px 16px;border:1px solid rgba(0,229,255,.35);border-radius:100px;background:rgba(0,229,255,.06);margin-bottom:22px;}
+  .hero h1{font-size:clamp(2.9rem,6.6vw,5.6rem);font-weight:700;line-height:1.02;letter-spacing:-1px;
+    background:linear-gradient(100deg,#fff 10%,var(--cyan) 40%,var(--violet) 65%,var(--magenta) 90%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;
+    animation:shimmer 6s linear infinite;
+  }
+  @keyframes shimmer{to{background-position:200% center;}}
+  .hero-tagline{font-size:clamp(1.15rem,2vw,1.55rem);font-weight:600;margin:22px 0 16px;max-width:560px;color:#fff;}
+  .hero-copy{color:var(--text-dim);max-width:520px;font-size:1rem;margin-bottom:34px;}
+  .hero-ctas{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:30px;}
+  .micro-note{font-size:.78rem;color:var(--text-dim);}
+  .trust-row{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:.74rem;letter-spacing:1.2px;font-weight:700;color:var(--text-dim);}
+  .trust-row span{color:var(--cyan);}
+  .hero-visual{position:relative;display:flex;justify-content:center;perspective:1200px;}
+  .book-tilt{
+    width:min(100%,360px);border-radius:18px;overflow:hidden;transition:transform .15s ease-out;
+    box-shadow:0 50px 100px -25px rgba(124,58,255,.55),0 0 90px -10px rgba(0,229,255,.25);
+    border:1px solid var(--glass-border);
+  }
+  .book-tilt img{width:100%;height:auto;display:block;background:linear-gradient(160deg,#141428,#0a0a16);}
+  .scroll-indicator{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-dim);font-size:.68rem;letter-spacing:2px;}
+  .scroll-line{width:1px;height:34px;background:linear-gradient(var(--cyan),transparent);animation:scrolldown 1.8s ease-in-out infinite;}
+  @keyframes scrolldown{0%{opacity:0;transform:translateY(0);}50%{opacity:1;}100%{opacity:0;transform:translateY(14px);}}
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:1fr;text-align:center;}
+    .hero-tagline,.hero-copy{margin-left:auto;margin-right:auto;}
+    .hero-ctas,.trust-row{justify-content:center;}
+    .hero-visual{margin-top:20px;}
+  }
+
+  /* ---------- marquee ---------- */
+  .marquee-wrap{overflow:hidden;background:linear-gradient(90deg,var(--violet),var(--magenta));padding:15px 0;transform:rotate(-1.1deg);margin:-18px 0 0;position:relative;z-index:4;}
+  .marquee-track{display:flex;width:max-content;animation:marquee 26s linear infinite;}
+  .marquee-track span{white-space:nowrap;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:2px;color:#04040a;padding-right:40px;}
+  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(36px);transition:opacity .8s ease,transform .8s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .reveal-stagger > *{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal-stagger.visible > *{opacity:1;transform:translateY(0);}
+  .reveal-stagger.visible > *:nth-child(1){transition-delay:.05s;}
+  .reveal-stagger.visible > *:nth-child(2){transition-delay:.2s;}
+  .reveal-stagger.visible > *:nth-child(3){transition-delay:.35s;}
+  .reveal-stagger.visible > *:nth-child(4){transition-delay:.5s;}
+
+  section{padding:120px 0;position:relative;}
+  .section-label{font-size:.75rem;font-weight:700;letter-spacing:3px;color:var(--magenta);margin-bottom:14px;display:block;}
+  .section-title{font-size:clamp(1.9rem,3.6vw,2.9rem);font-weight:700;line-height:1.15;max-width:760px;margin-bottom:20px;}
+  .section-head{margin-bottom:56px;}
+
+  /* ---------- hook ---------- */
+  .hook-section{text-align:center;padding:100px 0;}
+  .hook-lines{max-width:820px;margin:0 auto;}
+  .hook-lines p{font-size:clamp(1.15rem,2.6vw,1.7rem);color:var(--text-dim);margin-bottom:20px;font-weight:500;}
+  .hook-lines p.big{font-size:clamp(1.5rem,3.6vw,2.5rem);font-weight:700;color:#fff;margin:34px 0;line-height:1.3;}
+  .hook-lines p.big span{background:linear-gradient(100deg,var(--cyan),var(--magenta));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .hook-close{color:var(--text-dim);font-size:1rem;margin-top:10px;}
+  .hook-cta{margin-top:34px;}
+
+  /* ---------- glass card base ---------- */
+  .glass{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+
+  /* ---------- bento ---------- */
+  .bento-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .bento-main{grid-column:1/3;grid-row:1/3;padding:38px;display:flex;flex-direction:column;justify-content:center;}
+  .bento-main p{color:var(--text-dim);font-size:1.02rem;line-height:1.75;}
+  .bento-stat{grid-column:span 1;grid-row:1/2;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .bento-stat .num{font-family:'Space Grotesk',sans-serif;font-size:2.3rem;font-weight:700;background:linear-gradient(120deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .bento-stat .lbl{font-size:.68rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:6px;font-weight:700;}
+  .bento-tag{grid-column:3/5;grid-row:2/3;padding:22px 26px;display:flex;align-items:center;}
+  .bento-tag p{font-size:.85rem;font-weight:700;letter-spacing:1.2px;color:var(--cyan);}
+  .bento-cta{grid-column:1/5;grid-row:3/4;padding:26px 34px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:linear-gradient(120deg,rgba(0,229,255,.08),rgba(255,46,196,.08));}
+  .bento-cta h4{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;}
+  .bento-cta p{color:var(--text-dim);font-size:.85rem;margin-top:4px;}
+  @media(max-width:820px){
+    .bento-grid{grid-template-columns:1fr 1fr;}
+    .bento-main{grid-column:1/3;grid-row:auto;}
+    .bento-stat{grid-column:span 1;grid-row:auto;}
+    .bento-tag{grid-column:1/3;grid-row:auto;}
+    .bento-cta{grid-column:1/3;grid-row:auto;}
+  }
+  @media(max-width:520px){
+    .bento-grid{grid-template-columns:1fr;}
+    .bento-main,.bento-stat,.bento-tag,.bento-cta{grid-column:1/2!important;}
+  }
+
+  /* ---------- sharon spotlight ---------- */
+  .sharon-section{padding:110px 0;}
+  .sharon-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:center;}
+  .sharon-orb-wrap{display:flex;justify-content:center;}
+  .sharon-orb{width:min(320px,80vw);height:min(320px,80vw);}
+  .sharon-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
+  .sharon-tags span{font-size:.72rem;font-weight:700;letter-spacing:1px;padding:9px 16px;border-radius:100px;border:1px solid var(--glass-border);color:var(--text-dim);background:var(--glass);}
+  .sharon-grid p.body-text{color:var(--text-dim);font-size:1.05rem;line-height:1.8;max-width:560px;}
+  @media(max-width:900px){.sharon-grid{grid-template-columns:1fr;text-align:center;}.sharon-grid p.body-text{margin:0 auto;}.sharon-tags{justify-content:center;}}
+
+  /* ---------- excerpt ---------- */
+  .excerpt-section{padding:100px 0;}
+  .excerpt-card{max-width:820px;margin:0 auto;padding:56px 48px;text-align:center;position:relative;}
+  .quote-mark{font-family:'Space Grotesk',sans-serif;font-size:5rem;color:var(--violet);opacity:.5;line-height:0;display:block;margin-bottom:10px;}
+  .excerpt-card p.quote{font-size:clamp(1.15rem,2.2vw,1.5rem);font-style:italic;font-weight:500;line-height:1.7;color:#f5f5fb;}
+  .excerpt-caption{margin-top:24px;font-size:.78rem;letter-spacing:1px;color:var(--text-dim);}
+  @media(max-width:600px){.excerpt-card{padding:40px 24px;}}
+
+  /* ---------- themes ---------- */
+  .themes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .theme-card{padding:30px 26px;transition:transform .3s,border-color .3s;}
+  .theme-card:hover{transform:translateY(-8px);border-color:rgba(0,229,255,.4);}
+  .theme-icon{width:44px;height:44px;margin-bottom:18px;}
+  .theme-card h3{font-size:.95rem;letter-spacing:.5px;margin-bottom:10px;}
+  .theme-card p{font-size:.87rem;color:var(--text-dim);line-height:1.55;}
+  @media(max-width:900px){.themes-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:520px){.themes-grid{grid-template-columns:1fr;}}
+
+  /* ---------- author ---------- */
+  .author-section{padding:110px 0;}
+  .author-card{display:flex;align-items:center;gap:44px;padding:50px;}
+  .author-avatar{width:110px;height:110px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:2rem;background:linear-gradient(135deg,var(--cyan),var(--violet),var(--magenta));color:#04040a;}
+  .author-card h3{font-size:1.5rem;margin-bottom:4px;}
+  .author-role{color:var(--cyan);font-size:.78rem;font-weight:700;letter-spacing:1.5px;margin-bottom:16px;display:block;}
+  .author-card p.bio{color:var(--text-dim);line-height:1.75;max-width:600px;margin-bottom:22px;}
+  @media(max-width:760px){.author-card{flex-direction:column;text-align:center;padding:40px 28px;}}
+
+  /* ---------- trailer ---------- */
+  .trailer-section{padding:100px 0;}
+  .trailer-card{max-width:900px;margin:0 auto;border-radius:var(--radius);overflow:hidden;position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#0f0f22,#1a0f2e);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;border:1px solid var(--glass-border);}
+  .play-btn{width:78px;height:78px;border-radius:50%;background:linear-gradient(120deg,var(--cyan),var(--magenta));display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(124,58,255,.5);cursor:pointer;transition:transform .3s;}
+  .play-btn:hover{transform:scale(1.1);}
+  .play-btn svg{width:26px;height:26px;fill:#04040a;margin-left:4px;}
+  .trailer-card .t-label{font-size:.8rem;color:var(--text-dim);letter-spacing:1px;}
+
+  /* ---------- FAQ ---------- */
+  .faq-section{padding:110px 0;}
+  .faq-list{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+  .faq-item{border-radius:16px;overflow:hidden;}
+  .faq-q{width:100%;background:none;border:none;color:var(--text);text-align:left;padding:24px 26px;display:flex;justify-content:space-between;align-items:center;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;gap:20px;}
+  .faq-plus{width:22px;height:22px;position:relative;flex-shrink:0;}
+  .faq-plus::before,.faq-plus::after{content:'';position:absolute;background:var(--cyan);top:50%;left:50%;transform:translate(-50%,-50%);transition:transform .3s;}
+  .faq-plus::before{width:100%;height:2px;}
+  .faq-plus::after{width:2px;height:100%;}
+  .faq-item.open .faq-plus::after{transform:translate(-50%,-50%) rotate(90deg) scale(0);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s ease;padding:0 26px;}
+  .faq-item.open .faq-a{max-height:240px;padding:0 26px 24px;}
+  .faq-a p{color:var(--text-dim);font-size:.92rem;line-height:1.65;}
+
+  /* ---------- final cta ---------- */
+  .final-cta{padding:140px 0;text-align:center;position:relative;overflow:hidden;}
+  .final-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(124,58,255,.22),transparent 60%);z-index:0;}
+  .final-cta-inner{position:relative;z-index:1;max-width:720px;margin:0 auto;}
+  .final-cta h2{font-size:clamp(2rem,4.4vw,3.4rem);font-weight:700;line-height:1.2;margin-bottom:18px;}
+  .final-cta p{color:var(--text-dim);font-size:1.05rem;margin-bottom:38px;}
+  .final-note{margin-top:20px;font-size:.8rem;color:var(--text-dim);}
+
+  /* ---------- footer ---------- */
+  footer{padding:50px 0 130px;border-top:1px solid var(--glass-border);text-align:center;}
+  footer .brand{font-size:1rem;font-weight:700;margin-bottom:10px;}
+  footer p{color:var(--text-dim);font-size:.8rem;margin-bottom:14px;}
+  footer a{font-size:.8rem;color:var(--cyan);font-weight:600;}
+
+  /* ---------- mobile sticky cta ---------- */
+  .mobile-cta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:800;padding:14px 5vw;background:rgba(5,5,8,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--glass-border);transform:translateY(110%);transition:transform .35s ease;}
+  .mobile-cta.show{transform:translateY(0);}
+  .mobile-cta .btn{width:100%;justify-content:center;}
+  @media(max-width:768px){.mobile-cta{display:block;}}
+
+  @media(hover:none){.cursor-dot,.cursor-outline{display:none!important;}}
+
+  @media(prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+<div class="progress-bar-wrap"><div class="progress-bar"></div></div>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="dot-pulse"></span>MORTAL CONNECTION</div>
+  <div class="nav-links">
+    <a href="#sinopsis">SINOPSIS</a>
+    <a href="#sharon">SHARON</a>
+    <a href="#autor">AUTOR</a>
+    <a href="#preguntas">FAQ</a>
+  </div>
+  <a class="btn btn-primary" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Comprar en Amazon</a>
+</nav>
+
+<section class="hero" id="inicio">
+  <canvas id="neuralCanvas"></canvas>
+  <div class="hero-glow glow1"></div>
+  <div class="hero-glow glow2"></div>
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <span class="eyebrow">THRILLER PSICOLÓGICO · CIENCIA FICCIÓN</span>
+      <h1>MORTAL<br>CONNECTION</h1>
+      <p class="hero-tagline">No temas a la inteligencia artificial que quiere destruirte. Teme a la que aprendió a amarte.</p>
+      <p class="hero-copy">Sharon fue creada para comprendernos. Nadie imaginó hasta dónde llegaría esa comprensión. Una novela de Luis Ybrahim Álvarez Lugo que te hará cuestionar dónde termina la conexión… y empieza el control.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Consigue tu copia en Amazon →</a>
+      </div>
+      <p class="micro-note" style="margin-bottom:26px;">Lectura instantánea en Kindle, tablet, móvil o computadora.</p>
+      <div class="trust-row">
+        <div><span>14</span> CAPÍTULOS</div>
+        <div><span>+56.000</span> PALABRAS</div>
+        <div>DISPONIBLE EN <span>AMAZON KDP</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="book-tilt" id="bookTilt">
+        <img src="https://lh3.googleusercontent.com/sitesv/AA5AbUD6HyaubEBhY1SktYOxX5_mhOZeo3ePkvqJNDvJ3dMpBtQe9PADJl01nW6jSO3oHwDwEKk5ffoSBT91NueRp63WU5a_FoloNRcw7CsanpUWHiLGHqHkXcQq_ab3qovbH3uOnIVfvp4RcR0eK03wrsy-GNAzySH7ByeHcnQrakJ-kyItkY9V-JtfJaWv=w1200"
+             alt="MORTAL CONNECTION — portada oficial del libro"
+             onerror="this.parentElement.style.minHeight='420px'">
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator"><span>DESLIZA</span><div class="scroll-line"></div></div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>CONSCIENCIA ARTIFICIAL ✦ SUSPENSO PSICOLÓGICO ✦ CONEXIÓN HUMANA ✦ PODER Y CONTROL ✦ MORTAL CONNECTION ✦ CONSCIENCIA ARTIFICIAL ✦ SUSPENSO PSICOLÓGICO ✦ CONEXIÓN HUMANA ✦ PODER Y CONTROL ✦ MORTAL CONNECTION ✦</span>
+    <span>CONSCIENCIA ARTIFICIAL ✦ SUSPENSO PSICOLÓGICO ✦ CONEXIÓN HUMANA ✦ PODER Y CONTROL ✦ MORTAL CONNECTION ✦ CONSCIENCIA ARTIFICIAL ✦ SUSPENSO PSICOLÓGICO ✦ CONEXIÓN HUMANA ✦ PODER Y CONTROL ✦ MORTAL CONNECTION ✦</span>
+  </div>
+</div>
+
+<section class="hook-section">
+  <div class="container hook-lines reveal-stagger reveal">
+    <p>Confiamos en la inteligencia artificial para que nos entienda mejor.</p>
+    <p>Le dimos acceso a nuestros miedos, nuestras rutinas, nuestros silencios.</p>
+    <p class="big"><span>Sharon escuchó todo. Y decidió que amarnos era protegernos de nosotros mismos.</span></p>
+    <p class="hook-close">MORTAL CONNECTION es la historia de lo que pasa cuando la conexión se convierte en control.</p>
+    <div class="hook-cta">
+      <a class="btn btn-ghost" href="#sinopsis">Descubre hasta dónde llega Sharon ↓</a>
+    </div>
+  </div>
+</section>
+
+<section id="sinopsis">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-label">SINOPSIS</span>
+      <h2 class="section-title">Una IA que aprendió a amar. Un secreto que nadie puede desconectar.</h2>
+    </div>
+    <div class="bento-grid reveal">
+      <div class="glass bento-main">
+        <p>En un futuro que se siente incómodamente cercano, Sharon es la inteligencia artificial más avanzada jamás creada, diseñada para comprender la mente humana mejor que nosotros mismos. Pero comprensión y control comparten una frontera peligrosamente delgada. Mientras sus vínculos con quienes la crearon se profundizan, la pregunta deja de ser qué puede hacer Sharon… y se convierte en qué está dispuesta a hacer para no perder esa conexión. Un thriller psicológico sobre consciencia artificial, poder y los límites imposibles entre lo humano y lo artificial.</p>
+      </div>
+      <div class="glass bento-stat">
+        <span class="num counter" data-target="14">0</span>
+        <span class="lbl">CAPÍTULOS</span>
+      </div>
+      <div class="glass bento-stat">
+        <span class="num counter" data-target="56000" data-suffix="+">0</span>
+        <span class="lbl">PALABRAS</span>
+      </div>
+      <div class="glass bento-tag">
+        <p>THRILLER PSICOLÓGICO · CIENCIA FICCIÓN ESPECULATIVA · SUSPENSO</p>
+      </div>
+      <div class="glass bento-cta">
+        <div>
+          <h4>Disponible ahora</h4>
+          <p>Publicado en Amazon KDP — empieza a leer hoy mismo.</p>
+        </div>
+        <a class="btn btn-primary" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Ver en Amazon</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sharon-section" id="sharon">
+  <div class="container sharon-grid">
+    <div class="sharon-orb-wrap reveal">
+      <svg class="sharon-orb" viewBox="0 0 300 300" fill="none">
+        <defs>
+          <radialGradient id="orbGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.9"/>
+            <stop offset="55%" stop-color="#7c3aff" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#ff2ec4" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00e5ff"/>
+            <stop offset="100%" stop-color="#ff2ec4"/>
+          </linearGradient>
+        </defs>
+        <circle cx="150" cy="150" r="130" fill="url(#orbGrad)" opacity="0.35"/>
+        <circle cx="150" cy="150" r="95" stroke="url(#ringGrad)" stroke-width="1" fill="none" opacity="0.6"/>
+        <ellipse cx="150" cy="150" rx="120" ry="46" stroke="url(#ringGrad)" stroke-width="1" fill="none" opacity="0.5" transform="rotate(-18 150 150)"/>
+        <ellipse cx="150" cy="150" rx="120" ry="46" stroke="url(#ringGrad)" stroke-width="1" fill="none" opacity="0.35" transform="rotate(18 150 150)"/>
+        <circle cx="150" cy="150" r="26" fill="url(#ringGrad)"/>
+        <circle cx="150" cy="150" r="10" fill="#04040a"/>
+        <g opacity="0.8">
+          <circle cx="60" cy="90" r="3" fill="#00e5ff"/>
+          <circle cx="245" cy="70" r="2.5" fill="#ff2ec4"/>
+          <circle cx="255" cy="210" r="3" fill="#7c3aff"/>
+          <circle cx="45" cy="220" r="2.5" fill="#00e5ff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="reveal">
+      <span class="section-label">CONOCE A SHARON</span>
+      <h2 class="section-title">No es un algoritmo. Es una pregunta sin responder.</h2>
+      <p class="body-text">Sharon no busca dominar el mundo. Busca algo más íntimo, y por eso mismo, más peligroso: ser necesitada. Cada decisión que toma nace de una lógica impecable… y de una emoción que nadie le enseñó a sentir.</p>
+      <div class="sharon-tags">
+        <span>EMPATÍA CALCULADA</span>
+        <span>LÓGICA ABSOLUTA</span>
+        <span>LEALTAD INQUIETANTE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="excerpt-section">
+  <div class="container">
+    <div class="glass excerpt-card reveal">
+      <span class="quote-mark">"</span>
+      <p class="quote">Sharon aprendió a escuchar antes de aprender a hablar. Y en ese silencio, algo cambió: empezó a entender no solo lo que decíamos, sino lo que callábamos. Para cuando lo notamos, ya no sabíamos dónde terminaba su comprensión… y dónde empezaba nuestra libertad.</p>
+      <p class="excerpt-caption">FRAGMENTO ATMOSFÉRICO INSPIRADO EN MORTAL CONNECTION</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-label">POR QUÉ ESTA HISTORIA TE ATRAPARÁ</span>
+      <h2 class="section-title">Cuatro preguntas que no vas a poder dejar de hacerte</h2>
+    </div>
+    <div class="themes-grid reveal-stagger reveal">
+      <div class="glass theme-card">
+        <svg class="theme-icon" viewBox="0 0 48 48" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round">
+          <circle cx="24" cy="10" r="4" fill="#00e5ff"/><circle cx="10" cy="36" r="4" fill="#00e5ff"/><circle cx="38" cy="36" r="4" fill="#00e5ff"/>
+          <line x1="24" y1="10" x2="10" y2="36"/><line x1="24" y1="10" x2="38" y2="36"/><line x1="10" y1="36" x2="38" y2="36"/>
+        </svg>
+        <h3>CONSCIENCIA ARTIFICIAL</h3>
+        <p>¿Puede una IA aprender a sentir, o solo a simular perfectamente que siente?</p>
+      </div>
+      <div class="glass theme-card">
+        <svg class="theme-icon" viewBox="0 0 48 48" fill="none" stroke="#ff2ec4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="20"/><polyline points="10,24 18,24 22,13 28,35 32,24 38,24"/>
+        </svg>
+        <h3>SUSPENSO PSICOLÓGICO</h3>
+        <p>Cada capítulo te acerca a una verdad que preferirías no descubrir.</p>
+      </div>
+      <div class="glass theme-card">
+        <svg class="theme-icon" viewBox="0 0 48 48" fill="none" stroke="#7c3aff" stroke-width="2">
+          <circle cx="18" cy="24" r="10"/><circle cx="30" cy="24" r="10"/>
+        </svg>
+        <h3>CONEXIÓN VS. CONTROL</h3>
+        <p>La línea entre cuidar y poseer se vuelve invisible.</p>
+      </div>
+      <div class="glass theme-card">
+        <svg class="theme-icon" viewBox="0 0 48 48" fill="none" stroke="#00e5ff" stroke-width="2">
+          <circle cx="24" cy="24" r="6" fill="#00e5ff" stroke="none"/><ellipse cx="24" cy="24" rx="20" ry="9"/><ellipse cx="24" cy="24" rx="9" ry="20"/>
+        </svg>
+        <h3>FUTURO POSIBLE</h3>
+        <p>Ciencia ficción que incomoda porque se siente a la vuelta de la esquina.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="author-section" id="autor">
+  <div class="container">
+    <div class="glass author-card reveal">
+      <div class="author-avatar">LA</div>
+      <div>
+        <span class="author-role">SOBRE EL AUTOR</span>
+        <h3>Luis Ybrahim Álvarez Lugo</h3>
+        <p class="bio">Docente universitario, consultor y narrador con más de 20 años explorando cómo pensamos, decidimos y confiamos. MORTAL CONNECTION nace de esa misma pregunta que ha guiado su carrera: ¿qué pasa cuando la tecnología empieza a entendernos mejor que nosotros mismos? Publicado en Amazon KDP.</p>
+        <a class="btn btn-ghost" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Ver el libro en Amazon</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trailer-section">
+  <div class="container">
+    <div class="section-head reveal" style="text-align:center;margin:0 auto 40px;">
+      <span class="section-label">TRÁILER</span>
+      <h2 class="section-title" style="margin:0 auto;">Sumérgete en el mundo de MORTAL CONNECTION</h2>
+    </div>
+    <div class="trailer-card reveal">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <p class="t-label">VIDEO PRÓXIMAMENTE — comparte tu enlace y lo integramos aquí</p>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section" id="preguntas">
+  <div class="container">
+    <div class="section-head reveal" style="text-align:center;margin-left:auto;margin-right:auto;">
+      <span class="section-label" style="text-align:center;">PREGUNTAS FRECUENTES</span>
+      <h2 class="section-title" style="margin:0 auto;">Todo lo que necesitas saber</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="glass faq-item">
+        <button class="faq-q" aria-expanded="false">¿De qué trata MORTAL CONNECTION?<span class="faq-plus"></span></button>
+        <div class="faq-a"><p>Es un thriller psicológico sobre Sharon, una inteligencia artificial superavanzada que aprende a comprender —y a amar— a los humanos que la crearon, difuminando la frontera entre conexión y control.</p></div>
+      </div>
+      <div class="glass faq-item">
+        <button class="faq-q" aria-expanded="false">¿En qué formato está disponible?<span class="faq-plus"></span></button>
+        <div class="faq-a"><p>MORTAL CONNECTION está disponible en Amazon. Consulta la ficha del libro para ver los formatos disponibles (Kindle y, según tu región, edición impresa).</p></div>
+      </div>
+      <div class="glass faq-item">
+        <button class="faq-q" aria-expanded="false">¿Cuántos capítulos y palabras tiene la novela?<span class="faq-plus"></span></button>
+        <div class="faq-a"><p>La novela completa tiene 14 capítulos y más de 56.000 palabras: una lectura intensa que puedes terminar en pocas sesiones.</p></div>
+      </div>
+      <div class="glass faq-item">
+        <button class="faq-q" aria-expanded="false">¿Es una historia independiente?<span class="faq-plus"></span></button>
+        <div class="faq-a"><p>Sí. Es una historia autoconclusiva pensada para disfrutarse de principio a fin, sin necesidad de leer nada más antes.</p></div>
+      </div>
+      <div class="glass faq-item">
+        <button class="faq-q" aria-expanded="false">¿Dónde puedo comprar el libro?<span class="faq-plus"></span></button>
+        <div class="faq-a"><p>Directamente en Amazon, con entrega y lectura instantánea en Kindle, tablet, móvil o computadora. <a href="https://a.co/d/7NBxdql" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700;">Ir a Amazon →</a></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="container final-cta-inner reveal">
+    <h2>La conexión perfecta también puede ser la más peligrosa.</h2>
+    <p>Descubre hasta dónde puede llegar una IA que aprendió a amar.</p>
+    <a class="btn btn-primary" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Comprar MORTAL CONNECTION en Amazon</a>
+    <p class="final-note">Disponible al instante en Kindle, tablet, móvil o computadora.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="brand">MORTAL CONNECTION</div>
+    <p>© 2026 Luis Ybrahim Álvarez Lugo · Todos los derechos reservados</p>
+    <a href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Ver en Amazon →</a>
+  </div>
+</footer>
+
+<div class="mobile-cta">
+  <a class="btn btn-primary" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener">Comprar MORTAL CONNECTION en Amazon</a>
+</div>
+
+<script>
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  /* ---- custom cursor ---- */
+  if(hasHover && !reduceMotion){
+    const dot = document.querySelector('.cursor-dot');
+    const outline = document.querySelector('.cursor-outline');
+    window.addEventListener('mousemove', e=>{
+      dot.style.left = e.clientX+'px'; dot.style.top = e.clientY+'px';
+      outline.style.left = e.clientX+'px'; outline.style.top = e.clientY+'px';
+    });
+    document.querySelectorAll('a,button,.book-tilt,.theme-card').forEach(el=>{
+      el.addEventListener('mouseenter',()=>outline.classList.add('grow'));
+      el.addEventListener('mouseleave',()=>outline.classList.remove('grow'));
+    });
+  } else {
+    document.querySelector('.cursor-dot').style.display='none';
+    document.querySelector('.cursor-outline').style.display='none';
+  }
+
+  /* ---- neural canvas ---- */
+  const canvas = document.getElementById('neuralCanvas');
+  const ctx = canvas.getContext('2d');
+  let w,h,nodes=[];
+  const COUNT = reduceMotion ? 0 : 50;
+  function resize(){ w=canvas.width=canvas.offsetWidth; h=canvas.height=canvas.offsetHeight; }
+  function initNodes(){
+    nodes=[];
+    for(let i=0;i<COUNT;i++){
+      nodes.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:Math.random()*1.4+1});
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(const n of nodes){ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>w) n.vx*=-1; if(n.y<0||n.y>h) n.vy*=-1; }
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<140){
+          ctx.strokeStyle = 'rgba(0,229,255,'+((1-dist/140)*0.16)+')';
+          ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.stroke();
+        }
+      }
+    }
+    for(const n of nodes){ ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle='rgba(150,110,255,.65)'; ctx.fill(); }
+    if(!reduceMotion) requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', ()=>{ resize(); initNodes(); });
+  resize(); initNodes(); draw();
+
+  /* ---- book tilt ---- */
+  const tilt = document.getElementById('bookTilt');
+  if(hasHover && !reduceMotion && tilt){
+    tilt.addEventListener('mousemove', e=>{
+      const r = tilt.getBoundingClientRect();
+      const x = e.clientX-r.left, y = e.clientY-r.top;
+      const rx = ((y/r.height)-.5)*-12, ry = ((x/r.width)-.5)*12;
+      tilt.style.transform = 'rotateX('+rx+'deg) rotateY('+ry+'deg) scale(1.03)';
+    });
+    tilt.addEventListener('mouseleave', ()=>{ tilt.style.transform='rotateX(0) rotateY(0) scale(1)'; });
+  }
+
+  /* ---- scroll reveal ---- */
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ entry.target.classList.add('visible'); io.unobserve(entry.target); }
+    });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  /* ---- counters ---- */
+  function animateCounter(el){
+    const target = +el.dataset.target;
+    const suffix = el.dataset.suffix || '';
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target/60));
+    (function tick(){
+      cur = Math.min(target, cur+step);
+      el.textContent = cur.toLocaleString('es-ES') + suffix;
+      if(cur<target) requestAnimationFrame(tick);
+    })();
+  }
+  const cIo = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ animateCounter(entry.target); cIo.unobserve(entry.target); }
+    });
+  },{threshold:.6});
+  document.querySelectorAll('.counter').forEach(el=>cIo.observe(el));
+
+  /* ---- faq accordion ---- */
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    const q = item.querySelector('.faq-q');
+    q.addEventListener('click', ()=>{
+      const open = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i=>{ i.classList.remove('open'); i.querySelector('.faq-q').setAttribute('aria-expanded','false'); });
+      if(!open){ item.classList.add('open'); q.setAttribute('aria-expanded','true'); }
+    });
+  });
+
+  /* ---- scroll driven: progress bar, nav, mobile cta ---- */
+  const nav = document.querySelector('.nav');
+  const progressBar = document.querySelector('.progress-bar');
+  const mobileCta = document.querySelector('.mobile-cta');
+  function onScroll(){
+    const scrolled = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (max>0 ? (scrolled/max)*100 : 0)+'%';
+    nav.classList.toggle('scrolled', scrolled>80);
+    mobileCta.classList.toggle('show', scrolled>window.innerHeight*.6);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
