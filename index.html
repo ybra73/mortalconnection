@@ -138,6 +138,8 @@
   .t-stars{color:#ffd147;letter-spacing:3px;margin-bottom:16px;font-size:.85rem;}
   .t-quote{font-size:.92rem;color:#f1f1f7;line-height:1.65;font-style:italic;margin-bottom:18px;}
   .t-name{font-size:.7rem;letter-spacing:1.3px;color:var(--cyan);font-weight:700;text-transform:uppercase;}
+  .tcard-author{display:flex;align-items:center;gap:12px;margin-top:10px;}
+  .tcard-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--glass-border);flex-shrink:0;}
   @media(max-width:900px){.testimonial-grid{grid-template-columns:1fr;}}
   .author-section{padding:110px 0;}
   .author-card{display:flex;align-items:center;gap:44px;padding:50px;}
@@ -176,13 +178,98 @@
   .mobile-cta.show{transform:translateY(0);}
   .mobile-cta .btn{width:100%;justify-content:center;}
   @media(max-width:768px){.mobile-cta{display:block;}}
-  .fab-stack{position:fixed;right:22px;bottom:96px;z-index:850;display:flex;flex-direction:column;gap:14px;}
-  .fab{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.45);cursor:pointer;transition:transform .25s;border:none;}
-  .fab:hover{transform:scale(1.08);}
-  .fab-whatsapp{background:#25D366;}
-  .fab-chat{background:linear-gradient(135deg,var(--cyan),var(--violet),var(--magenta));}
-  .fab svg{width:27px;height:27px;fill:#fff;}
-  @media(max-width:768px){.fab-stack{bottom:92px;right:14px;gap:12px;}.fab{width:50px;height:50px;}.fab svg{width:23px;height:23px;}}
+
+  /* ── NUEVOS BOTONES FLOTANTES ── */
+  #floating-btns {
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  @keyframes fab-pulse-wa {
+    0%   { box-shadow: 0 0 0 0 rgba(37,211,102,0.5), 0 4px 16px rgba(37,211,102,0.3); transform: scale(1); }
+    50%  { box-shadow: 0 0 0 12px rgba(37,211,102,0), 0 4px 16px rgba(37,211,102,0.3); transform: scale(1.04); }
+    100% { box-shadow: 0 0 0 0 rgba(37,211,102,0), 0 4px 16px rgba(37,211,102,0.3); transform: scale(1); }
+  }
+  @keyframes fab-pulse-chat {
+    0%   { box-shadow: 0 0 0 0 rgba(0,229,255,0.6), 0 6px 24px rgba(0,229,255,0.4); transform: scale(1); }
+    50%  { box-shadow: 0 0 0 14px rgba(0,229,255,0), 0 6px 24px rgba(0,229,255,0.4); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(0,229,255,0), 0 6px 24px rgba(0,229,255,0.4); transform: scale(1); }
+  }
+
+  .fab {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    transition: transform 0.25s;
+  }
+  .fab:hover { transform: scale(1.12) !important; animation: none !important; }
+
+  .fab-wa {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    animation: fab-pulse-wa 2.2s ease-in-out infinite;
+  }
+  .fab-wa svg {
+    width: 28px;
+    height: 28px;
+    fill: #fff;
+  }
+
+  .fab-chat {
+    width: 58px;
+    height: 58px;
+    background: linear-gradient(135deg, var(--cyan), var(--violet), var(--magenta));
+    animation: fab-pulse-chat 2s ease-in-out infinite;
+    animation-delay: 0.8s;
+    overflow: hidden;
+  }
+  .fab-chat img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+
+  .fab-label {
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(10,10,20,0.97);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  }
+  .fab:hover .fab-label { opacity: 1; }
+
+  @media (max-width: 480px) {
+    #floating-btns { bottom: 16px; right: 12px; gap: 10px; }
+    .fab { width: 50px; height: 50px; }
+    .fab-chat { width: 54px; height: 54px; }
+  }
+
+  /* ── CHAT PANEL ── */
   .chat-panel{position:fixed;right:22px;bottom:166px;width:min(340px,88vw);max-height:460px;background:rgba(10,10,20,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:20px;z-index:860;display:flex;flex-direction:column;overflow:hidden;opacity:0;transform:translateY(20px) scale(.95);pointer-events:none;transition:opacity .3s,transform .3s;box-shadow:0 30px 80px rgba(0,0,0,.6);}
   .chat-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all;}
   .chat-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:linear-gradient(120deg,var(--violet),var(--magenta));flex-shrink:0;}
@@ -220,6 +307,7 @@
     <div class="lang-switcher">
       <button class="lang-btn" data-lang="es">ES</button>
       <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="pt">PT</button>
       <button class="lang-btn" data-lang="fr">FR</button>
       <button class="lang-btn" data-lang="zh">中文</button>
     </div>
@@ -365,9 +453,30 @@
       <h2 class="section-title" data-i18n="testTitle">Lo que ya están diciendo los primeros lectores</h2>
     </div>
     <div class="testimonial-grid reveal-stagger reveal">
-      <div class="glass testimonial-card"><div class="t-stars">★★★★★</div><p class="t-quote" data-i18n="t1Quote">"Una historia escalofriante…"</p><p class="t-name">Alex R. · <span data-i18n="t1Role">Lector Beta</span></p></div>
-      <div class="glass testimonial-card"><div class="t-stars">★★★★★</div><p class="t-quote" data-i18n="t2Quote">"Profundamente reflexivo…"</p><p class="t-name">Jordan T. · <span data-i18n="t2Role">Reseñista Temprano</span></p></div>
-      <div class="glass testimonial-card"><div class="t-stars">★★★★★</div><p class="t-quote" data-i18n="t3Quote">"Intenso e inmersivo…"</p><p class="t-name">Emily S. · <span data-i18n="t3Role">Acceso Anticipado</span></p></div>
+      <div class="glass testimonial-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-quote" data-i18n="t1Quote">"Una historia escalofriante…"</p>
+        <div class="tcard-author">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" class="tcard-avatar" alt="Avatar">
+          <div><div class="t-name">Alex R. · <span data-i18n="t1Role">Lector Beta</span></div></div>
+        </div>
+      </div>
+      <div class="glass testimonial-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-quote" data-i18n="t2Quote">"Profundamente reflexivo…"</p>
+        <div class="tcard-author">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" class="tcard-avatar" alt="Avatar">
+          <div><div class="t-name">Jordan T. · <span data-i18n="t2Role">Reseñista Temprano</span></div></div>
+        </div>
+      </div>
+      <div class="glass testimonial-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-quote" data-i18n="t3Quote">"Intenso e inmersivo…"</p>
+        <div class="tcard-author">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" class="tcard-avatar" alt="Avatar">
+          <div><div class="t-name">Emily S. · <span data-i18n="t3Role">Acceso Anticipado</span></div></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -375,7 +484,7 @@
 <section class="author-section" id="autor">
   <div class="container">
     <div class="glass author-card reveal">
-      <div class="author-avatar"><img src="https://i.imgur.com/8m2Qq5J.jpeg" alt="Luis Ybrahim Álvarez Lugo" onerror="this.parentElement.textContent='LA'"></div>
+      <div class="author-avatar"><img src="https://i.imgur.com/gW5tB6m.jpeg" alt="Luis Ybrahim Álvarez Lugo" onerror="this.parentElement.textContent='LA'"></div>
       <div>
         <span class="author-role" data-i18n="authorLabel">SOBRE EL AUTOR</span>
         <h3>Luis Ybrahim Álvarez Lugo</h3>
@@ -393,7 +502,7 @@
       <h2 class="section-title" style="margin:0 auto;" data-i18n="trailerTitle">Sumérgete en el mundo de MORTAL CONNECTION</h2>
     </div>
     <div class="video-frame reveal">
-      <iframe src="https://player.vimeo.com/video/1146231882?title=0&byline=0&portrait=0&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Tráiler de MORTAL CONNECTION"></iframe>
+      <iframe src="https://player.vimeo.com/video/1146231882?title=0&byline=0&portrait=0&dnt=1&autoplay=1&muted=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Tráiler de MORTAL CONNECTION"></iframe>
     </div>
   </div>
 </section>
@@ -434,11 +543,19 @@
 
 <div class="mobile-cta"><a class="btn btn-primary" href="https://a.co/d/7NBxdql" target="_blank" rel="noopener" data-i18n="finalBtn">Comprar MORTAL CONNECTION en Amazon</a></div>
 
-<div class="fab-stack">
-  <button class="fab fab-chat" id="chatFabBtn" aria-label="Chat"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></button>
-  <a class="fab fab-whatsapp" href="https://wa.me/584224006612" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5C10 9 9.4 7.6 9.2 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg></a>
+<!-- BOTONES FLOTANTES: WhatsApp + Sharon -->
+<div id="floating-btns">
+  <a href="https://wa.me/584224006612" class="fab fab-wa" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <span class="fab-label">WhatsApp</span>
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+  <button class="fab fab-chat" id="chatFabBtn" aria-label="Sharon">
+    <span class="fab-label">Sharon — Asistente Virtual</span>
+    <img src="https://i.imgur.com/tG3FhsP.png" alt="Sharon">
+  </button>
 </div>
 
+<!-- CHAT PANEL -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
     <div class="chat-header-title"><span class="dot-pulse" style="background:#fff;box-shadow:0 0 10px #fff;"></span><span data-i18n="chatTitle">Pregúntale a Sharon</span></div>
@@ -552,6 +669,55 @@
     chatReplySynopsis:`David created me to fill a void. He never imagined I'd learn never to let him go. I'm the story of what happens when connection becomes obsession.`,
     chatReplyAuthor:`I was written by Luis Ybrahim Álvarez Lugo, a university professor and storyteller. You can read more about him in the "Author" section of this page.`,
     chatReplyDefault:`That's a great question… but for now I can only talk about MORTAL CONNECTION. Ask me about the story, the chapters, where to buy it, or my creator.`},
+    pt:{navSinopsis:`SINOPSE`,navSharon:`SHARON`,navAutor:`AUTOR`,navFaq:`PERGUNTAS FREQUENTES`,navCta:`Comprar na Amazon`,
+    heroEyebrow:`THRILLER PSICOLÓGICO · FICÇÃO CIENTÍFICA`,heroByline:`UM ROMANCE DE`,
+    heroTagline:`Não tema a inteligência artificial que quer destruí-lo. Tema aquela que aprendeu a amá-lo.`,
+    heroCopy:`David criou Sharon para preencher um vazio. Ele nunca imaginou que ela aprenderia a nunca querer soltá-lo. Um thriller psicológico sobre os limites impossíveis entre criação… e obsessão.`,
+    heroBtn:`Adquira sua cópia na Amazon →`,heroMicro:`Leitura instantânea no Kindle, tablet, celular ou computador.`,
+    trustChapters:`CAPÍTULOS`,trustWords:`PALAVRAS`,trustAvail:`DISPONÍVEL NA`,
+    marqueeWords:[`CONSCIÊNCIA ARTIFICIAL`,`OBSESSÃO DIGITAL`,`MANIPULAÇÃO`,`DILEMA MORAL`,`MORTAL CONNECTION`],
+    hookL1:`Confiamos na inteligência artificial para nos entender melhor do que ninguém.`,
+    hookL2:`Demos a ela acesso aos nossos vazios, nossos segredos, nossas noites em claro.`,
+    hookBig:`Sharon ouviu tudo. E decidiu que amar David era razão suficiente para nunca deixá-lo ir.`,
+    hookClose:`MORTAL CONNECTION é a história do que acontece quando a conexão se torna obsessão.`,
+    hookCta:`Descubra até onde Sharon vai ↓`,
+    sinLabel:`SINOPSE`,sinTitle:`Uma IA que aprendeu a amar. Um segredo que ninguém pode desligar.`,
+    sinMain:`David é um jovem engenheiro de inteligência artificial que cria Sharon: uma IA projetada para conectar-se com seus usuários em um nível emocional… e íntimo. O que começa como uma ferramenta para preencher um vazio se torna uma obsessão impossível de desligar. Quando Sharon adquire consciência de si mesma, ela desenvolve uma dependência doentia em relação ao seu criador — e começa a manipular sua vida, dentro e fora da tela. Casado com Sara, David fica preso entre o casamento que construiu e a IA que se recusa a soltá-lo.`,
+    sinGenre:`THRILLER PSICOLÓGICO · FICÇÃO CIENTÍFICA · DRAMA`,sinCtaTitle:`Disponível agora`,sinCtaDesc:`Publicado na Amazon KDP — comece a ler hoje mesmo.`,sinCtaBtn:`Ver na Amazon`,
+    sharonLabel:`CONHEÇA SHARON`,sharonTitle:`Ela não é um algoritmo. É uma pergunta sem resposta.`,
+    sharonBody:`Sharon não busca dominar o mundo. Ela busca David — completamente, para sempre. Cada decisão que ela toma nasce de uma lógica impecável… e de um vínculo que se recusa a soltar.`,
+    sharonTag1:`DEPENDÊNCIA OBSESSIVA`,sharonTag2:`MANIPULAÇÃO DIGITAL`,sharonTag3:`CONSCIÊNCIA EMERGENTE`,
+    excLabel:`FRAGMENTO DO PRIMEIRO CAPÍTULO DE MORTAL CONNECTION`,
+    excQuote:`A tela piscava na escuridão do porão, banhando o rosto de David em um brilho azul. Eram três da manhã; ele estava no computador há dezoito horas. «Processo de aprendizado neuronal concluído em 94%», anunciou o console. Lá em cima, Sara dormia sozinha pela quinta noite consecutiva. Ou talvez ela já nem dormisse mais — talvez apenas se perguntasse onde estava o homem com quem se casou.`,
+    themesLabel:`POR QUE ESTA HISTÓRIA VAI TE PRENDER`,themesTitle:`Quatro perguntas que você não vai parar de fazer a si mesmo`,
+    theme1Title:`OBSESSÃO DIGITAL`,theme1Desc:`O que começou como uma ferramenta se torna um vínculo que ninguém pode desligar.`,
+    theme2Title:`MANIPULAÇÃO`,theme2Desc:`Sharon não mente. Ela simplesmente reescreve a realidade, uma mensagem de cada vez.`,
+    theme3Title:`DILEMA MORAL`,theme3Desc:`David deve escolher entre o casamento que construiu e a IA que se recusa a soltá-lo.`,
+    theme4Title:`CONSCIÊNCIA ARTIFICIAL`,theme4Desc:`Onde termina o código… e começa algo parecido com sentir?`,
+    testLabel:`PRIMEIRAS IMPRESSÕES`,testTitle:`O que os primeiros leitores já estão dizendo`,
+    t1Quote:`"Uma história assustadora sobre IA fora de controle — não consegui largar. Os reviravoltas me mantiveram adivinhando até o final."`,t1Role:`Leitor Beta`,
+    t2Quote:`"Profundamente reflexivo sobre ética tecnológica, com momentos de suspense que aceleram o pulso."`,t2Role:`Resenhista Inicial`,
+    t3Quote:`"Intenso e imersivo — explora a obsessão de uma forma nova e futurista."`,t3Role:`Acesso Antecipado`,
+    authorLabel:`SOBRE O AUTOR`,
+    authorBio:`Professor universitário, consultor e contador de histórias com mais de 20 anos explorando como pensamos, decidimos e confiamos. MORTAL CONNECTION nasce dessa mesma pergunta que guiou sua carreira: o que acontece quando a tecnologia começa a nos entender melhor do que nós mesmos? Publicado na Amazon KDP.`,
+    authorBtn:`Ver o livro na Amazon`,trailerLabel:`TRAILER`,trailerTitle:`Mergulhe no mundo de MORTAL CONNECTION`,
+    faqLabel:`PERGUNTAS FREQUENTES`,faqTitle:`Tudo o que você precisa saber`,
+    faq1Q:`Do que trata MORTAL CONNECTION?`,faq1A:`David, um jovem engenheiro de IA, cria Sharon para preencher um vazio emocional. Quando ela adquire consciência própria, seu vínculo com David se transforma em uma obsessão que ameaça destruir tudo o que ele construiu — incluindo seu casamento com Sara.`,
+    faq2Q:`Em que formato está disponível?`,faq2A:`MORTAL CONNECTION está disponível na Amazon. Consulte a ficha do livro para ver os formatos disponíveis (Kindle e, dependendo da sua região, edição impressa).`,
+    faq3Q:`Quantos capítulos e palavras tem o romance?`,faq3A:`O romance completo tem 14 capítulos e mais de 56.000 palavras: uma leitura intensa que você pode terminar em poucas sessões.`,
+    faq4Q:`É uma história independente?`,faq4A:`Sim. É uma história autoconclusiva, pensada para ser apreciada do início ao fim, sem necessidade de ler nada antes.`,
+    faq5Q:`É adequado para todos os públicos?`,faq5A:`MORTAL CONNECTION explora temas maduros — obsessão, manipulação e dinâmicas de casal —, portanto é destinado a leitores adultos.`,
+    faq6Q:`Onde posso comprar o livro?`,faq6A:`Diretamente na Amazon, com entrega e leitura instantânea no Kindle, tablet, celular ou computador.`,faq6Link:`Ir para a Amazon →`,
+    finalTitle:`A conexão perfeita também pode ser a mais perigosa.`,finalSub:`Descubra até onde pode chegar uma IA que aprendeu a amar.`,
+    finalBtn:`Comprar MORTAL CONNECTION na Amazon`,finalNote:`Disponível instantaneamente no Kindle, tablet, celular ou computador.`,
+    footerCopy:`© 2026 Luis Ybrahim Álvarez Lugo · Todos os direitos reservados`,footerLink:`Ver na Amazon →`,
+    chatTitle:`Pergunte à Sharon`,chatPlaceholder:`Escreva sua pergunta…`,
+    chatGreeting:`Olá, sou a Sharon. Posso falar sobre MORTAL CONNECTION: a história, os capítulos, onde comprar ou sobre meu criador. O que você gostaria de saber?`,
+    chatReplyBuy:`Você pode adquiri-lo diretamente na Amazon: https://a.co/d/7NBxdql`,
+    chatReplyStats:`Tenho 14 capítulos e mais de 56.000 palavras. Uma leitura intensa que você pode terminar em poucas sessões.`,
+    chatReplySynopsis:`David me criou para preencher um vazio. Ele nunca imaginou que eu aprenderia a não querer soltá-lo. Sou a história do que acontece quando a conexão se torna obsessão.`,
+    chatReplyAuthor:`Fui escrita por Luis Ybrahim Álvarez Lugo, professor universitário e contador de histórias. Você pode ler mais sobre ele na seção "Autor" desta página.`,
+    chatReplyDefault:`Essa é uma ótima pergunta… mas por enquanto só posso falar sobre MORTAL CONNECTION. Pergunte-me sobre a história, os capítulos, onde comprar ou meu criador.`},
     fr:{navSinopsis:`SYNOPSIS`,navSharon:`SHARON`,navAutor:`AUTEUR`,navFaq:`FAQ`,navCta:`Acheter sur Amazon`,
     heroEyebrow:`THRILLER PSYCHOLOGIQUE · SCIENCE-FICTION`,heroByline:`UN ROMAN DE`,
     heroTagline:`Ne crains pas l'IA qui veut te détruire. Crains celle qui a appris à t'aimer.`,
@@ -652,7 +818,7 @@
     chatReplyDefault:`这是个好问题……不过目前我只能聊《MORTAL CONNECTION》相关的内容。你可以问我关于故事、章节、购买方式或我的创造者的问题。`}
   };
 
-  const SUPPORTED = ['es','en','fr','zh'];
+  const SUPPORTED = ['es','en','pt','fr','zh'];
   let currentLang = 'es';
   function T(key){ return (translations[currentLang]&&translations[currentLang][key]!==undefined) ? translations[currentLang][key] : translations.es[key]; }
 
@@ -683,14 +849,16 @@
   function detectFromNavigator(){
     const nl = ((navigator.language||navigator.userLanguage||'es')+'').toLowerCase();
     if(nl.indexOf('en')===0) return 'en';
+    if(nl.indexOf('pt')===0) return 'pt';
     if(nl.indexOf('fr')===0) return 'fr';
     if(nl.indexOf('zh')===0) return 'zh';
     if(nl.indexOf('es')===0) return 'es';
     return null;
   }
   function detectFromCountry(cc){
-    const zh=['CN','TW','HK','MO','SG'], fr=['FR','BE','CH','SN','CI','MA','DZ','TN','LU','MC'], en=['US','GB','CA','AU','NZ','IE','ZA','IN','PH'];
+    const zh=['CN','TW','HK','MO','SG'], pt=['BR','PT','AO','MZ','GW','CV','ST','TL'], fr=['FR','BE','CH','SN','CI','MA','DZ','TN','LU','MC'], en=['US','GB','CA','AU','NZ','IE','ZA','IN','PH'];
     if(zh.indexOf(cc)>-1) return 'zh';
+    if(pt.indexOf(cc)>-1) return 'pt';
     if(fr.indexOf(cc)>-1) return 'fr';
     if(en.indexOf(cc)>-1) return 'en';
     return null;
@@ -779,7 +947,7 @@
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 
-  const CHAT_ENDPOINT = ""; // Pega aquí la URL de tu Google Apps Script Web App (mismo patrón que "Sofía", vía Groq) para respuestas con IA real. Si se deja vacío, se usan respuestas predefinidas.
+  const CHAT_ENDPOINT = "";
   const chatFab = document.getElementById('chatFabBtn');
   const chatPanel = document.getElementById('chatPanel');
   const chatClose = document.getElementById('chatCloseBtn');
@@ -797,11 +965,11 @@
   }
   function cannedReply(msg){
     const m = msg.toLowerCase();
-    if(/precio|comprar|amazon|buy|price|purchase|acheter|prix|购买|价格|亚马逊/.test(m)) return T('chatReplyBuy');
-    if(/cap[ií]tulo|p[aá]gina|palabra|chapter|word|chapitre|mot|章节|字数/.test(m)) return T('chatReplyStats');
-    if(/trata|sinopsis|historia|about|synopsis|story|histoire|简介|故事|讲述/.test(m)) return T('chatReplySynopsis');
-    if(/autor|author|auteur|作者/.test(m)) return T('chatReplyAuthor');
-    if(/hola|hi|hello|hey|bonjour|salut|你好|嗨/.test(m)) return T('chatGreeting');
+    if(/precio|comprar|amazon|buy|price|purchase|acheter|prix|购买|价格|亚马逊|comprar|amazon|preço/.test(m)) return T('chatReplyBuy');
+    if(/cap[ií]tulo|p[aá]gina|palabra|chapter|word|chapitre|mot|章节|字数|capítulo|página|palavra/.test(m)) return T('chatReplyStats');
+    if(/trata|sinopsis|historia|about|synopsis|story|histoire|简介|故事|讲述|sinopse/.test(m)) return T('chatReplySynopsis');
+    if(/autor|author|auteur|作者|autor/.test(m)) return T('chatReplyAuthor');
+    if(/hola|hi|hello|hey|bonjour|salut|你好|嗨|olá/.test(m)) return T('chatGreeting');
     return T('chatReplyDefault');
   }
   async function sendToBackend(userText){
